@@ -1,0 +1,12 @@
+{
+  "app_name": "FNS Business Planning Closing Automation System",
+  "phase": "Phase 1 - Excel Understanding & Data Ingestion",
+  "scope": "KAM 2 only",
+  "required_sheets": [
+    "RAW_SYSTEM(PL)",
+    "RAW_SYSTEM(EXP)",
+    "Code Mapping"
+  ],
+  "closing_year_default": 2026,
+  "closing_month_default": 8
+}

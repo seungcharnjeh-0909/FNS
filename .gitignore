@@ -1,0 +1,21 @@
+# --- Python ---
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# --- Environment / secrets ---
+.env
+
+# --- Runtime data (never commit real company data) ---
+uploads/
+outputs/
+logs/
+data/company_data/
+*.xlsx
+*.xlsm
+!data/sample/*.xlsx
+
+# --- OS / editor ---
+.DS_Store
+.vscode/

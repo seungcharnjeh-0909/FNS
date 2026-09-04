@@ -1,0 +1,17 @@
+{
+  "raw_pl": {
+    "sheet_name": "RAW_SYSTEM(PL)",
+    "header_row": 2,
+    "required_columns": ["INDEX", "MONTH", "CCTR", "CCTR Name", "Item Code", "Item Name", "PERF"]
+  },
+  "raw_expense": {
+    "sheet_name": "RAW_SYSTEM(EXP)",
+    "header_row": 2,
+    "required_columns": ["INDEX", "MONTH", "CCTR", "CCTR Name", "Item Code", "Item Name", "PERF"]
+  },
+  "code_mapping": {
+    "sheet_name": "Code Mapping",
+    "header_row": 3,
+    "required_columns": ["CODE", "NAME", "ENTITY", "L/S", "BIZ UNIT", "DIVISION", "UNIT", "TEAM", "PERF GROUP", "LVL 1", "LVL 2", "LVL 3"]
+  }
+}
