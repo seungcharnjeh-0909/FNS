@@ -1,0 +1,16 @@
+{
+  "손익_KAM 2▷": {
+    "data_start_row": 5,
+    "lvl1_col_index": 1,
+    "account_code_col_index": 4,
+    "account_name_col_index": 5,
+    "perf_2026_start_col_index": 32,
+    "perf_2026_month_count": 12,
+    "total_row_lvl1_label": "사업실 합계"
+  },
+  "_notes": {
+    "col_index": "0-based index into the tuple returned by openpyxl's iter_rows(values_only=True) for that sheet.",
+    "how_found": "Inspected sheet rows 3-4 directly: row 3 has group labels ('2025 PERF', '2026 BP', '2026 PERF', ...) and row 4 has the month numbers 1-12 under each group. perf_2026_start_col_index points at month 1 of the '2026 PERF' block.",
+    "total_row_lvl1_label": "The mapping's grand-total row for KAM 2 scope. Verified: this row's 2026 PERF values match core.pnl_engine's KAM-2-scoped totals exactly for Revenue/Cost of Sales/GP1."
+  }
+}
