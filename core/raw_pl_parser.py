@@ -48,6 +48,8 @@ def parse_raw_pl(file: Union[str, "object"], sheet_name: str, header_row: int) -
         raise ValueError(f"RAW_SYSTEM(PL) is missing expected columns: {missing}")
 
     df = df[required].copy()
+    df["Item Code"] = df["Item Code"].astype(str).str.strip()
+    df["CCTR"] = df["CCTR"].astype(str).str.strip()
     df["PERF"] = pd.to_numeric(df["PERF"], errors="coerce")
     df["MONTH"] = pd.to_numeric(df["MONTH"], errors="coerce").astype("Int64")
 
