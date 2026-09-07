@@ -106,3 +106,39 @@ def top_expense_drivers(exp_df: pd.DataFrame, month: int, top_n: int = 10) -> pd
         .reset_index(drop=True)
     )
     return ranked
+def expense_item_variance(exp_df: pd.DataFrame, month_a: int, month_b: int, top_n: int = 10) -> pd.DataFrame:
+    """
+    Rank individual expense line items by how much they changed between
+    two months (month_a vs month_b) - the "Top Variance Driver" view
+    from project spec section 17, applied at the detail-item level.
+
+    Same scope limitation as top_expense_drivers(): only the Cost-nature
+    branch has real detail data in this workbook.
+
+    Args:
+        exp_df: cleaned RAW_SYSTEM(EXP) DataFrame.
+        month_a: the "current" month, e.g. 7.
+        month_b: the "compare" month, e.g. 6.
+        top_n: how many items to return, ranked by |variance| descending.
+
+    Returns:
+        DataFrame: Item Name, amount_a, amount_b, variance, variance_pct, rank
+    """
+    is_detail = ~exp_df["Item Code"].str.endswith("00")
+    detail = exp_df.loc[is_detail]
+
+    a = detail.loc[detail["MONTH"] == month_a].groupby("Item Name")["PERF"].sum()
+    b = detail.loc[detail["MONTH"] == month_b].groupby("Item Name")["PERF"].sum()
+
+    combined = pd.DataFrame({"amount_a": a, "amount_b": b}).fillna(0.0)
+    combined["variance"] = combined["amount_a"] - combined["amount_b"]
+    combined["variance_pct"] = combined["variance"] / combined["amount_b"].abs().replace(0, pd.NA)
+
+    ranked = (
+        combined.reindex(combined["variance"].abs().sort_values(ascending=False).index)
+        .head(top_n)
+        .reset_index()
+        .rename(columns={"index": "Item Name"})
+    )
+    ranked.insert(0, "rank", range(1, len(ranked) + 1))
+    return ranked
