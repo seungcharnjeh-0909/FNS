@@ -1,0 +1,15 @@
+{
+  "4410000": {"name": "CE - Salaries (원가성 인건비)", "type": "base_account"},
+  "4420000": {"name": "CE - General (원가성 일반경비)", "type": "base_account"},
+  "4200800": {"name": "Cost-nature Expense (원가성경비)", "type": "calculated", "formula": "4410000 + 4420000"},
+
+  "5100000": {"name": "SG&A Expenses (판매관리비)", "type": "base_account"},
+
+  "TOTAL_EXPENSE": {"name": "Total Expense (총 비용)", "type": "calculated", "formula": "4200800 + 5100000"},
+
+  "_notes": {
+    "why_not_leaf_sum": "Summing every detail (leaf) item code would double-count against these subtotal codes, AND silently under-count SG&A: in this workbook's RAW_SYSTEM(EXP), SG&A (51xxxxx) detail line items are all zero - only the 5100000 total itself is populated. So totals here always come from the verified top-level codes, never from summing detail rows.",
+    "verified": "4200800 == 4410000 + 4420000 confirmed exactly against RAW_SYSTEM(EXP) totals.",
+    "TOTAL_EXPENSE": "Not a real GL account code - a derived KPI for dashboard use. Excluded from the RAW self-consistency check (core/pnl_engine.check_calculated_accounts_against_raw) since there is no RAW row to compare it to."
+  }
+}
