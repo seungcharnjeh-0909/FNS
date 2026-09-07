@@ -1,0 +1,22 @@
+{
+  "4100000": {"name": "Revenue (매출액)", "type": "base_account"},
+  "4200000": {"name": "Cost of Sales (매출원가)", "type": "base_account"},
+  "4300000": {"name": "GP1 (매출총이익1)", "type": "calculated", "formula": "4100000 - 4200000"},
+
+  "4410000": {"name": "CE - Salaries", "type": "base_account"},
+  "4420000": {"name": "CE - General", "type": "base_account"},
+  "4400000": {"name": "GP2 (매출총이익2)", "type": "base_account"},
+
+  "5100001": {"name": "SG&A Expenses", "type": "base_account"},
+  "4500000": {"name": "Business Profit", "type": "base_account"},
+  "5200000": {"name": "Operating Profit", "type": "base_account"},
+
+  "6100000": {"name": "Non-operating Revenues", "type": "base_account"},
+  "6200000": {"name": "Non-operating Expenses", "type": "base_account"},
+  "6300000": {"name": "Ordinary Profit", "type": "calculated", "formula": "5200000 + 6100000 - 6200000"},
+
+  "_notes": {
+    "GP1_and_OrdinaryProfit": "Verified against RAW_SYSTEM(PL) totals - the formula reproduces the value already stored in RAW to within rounding.",
+    "GP2_and_below": "NOT recomputed via formula yet. GP2/Business Profit/Operating Profit involve allocation line items (e.g. 4200800, 5103601, 5103602) that are not yet fully mapped into this config. Marking these 'base_account' means we trust the value RAW already stored, rather than silently producing a wrong recomputed number. Revisit once allocation logic is confirmed."
+  }
+}
