@@ -40,6 +40,11 @@ if uploaded_file is None:
     st.stop()
 
 # --- Load workbook (openpyxl) for structural inspection ---
+# Keep the raw bytes too - later pages (e.g. golden-source comparison)
+# need to reopen the workbook for direct cell access, and the uploaded
+# file's buffer position is not safe to rely on across reruns.
+st.session_state["workbook_bytes"] = uploaded_file.getvalue()
+
 with st.spinner("Opening workbook..."):
     try:
         wb = load_workbook(uploaded_file)
