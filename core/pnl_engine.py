@@ -164,6 +164,12 @@ def check_calculated_accounts_against_raw(raw_df: pd.DataFrame, monthly_totals: 
         DataFrame: account_code, account_name, our_total, raw_total, difference
     """
     calculated_codes = [c for c, r in account_rules.items() if r["type"] == "calculated"]
+    # Skip synthetic/derived codes that don't exist as an actual Item Code in
+    # RAW (e.g. a "TOTAL_EXPENSE" KPI built from other accounts) - there is
+    # nothing in RAW to compare those against, so including them would always
+    # show a false "error" equal to their full amount.
+    codes_in_raw = set(raw_df["Item Code"].unique())
+    calculated_codes = [c for c in calculated_codes if c in codes_in_raw]
     if not calculated_codes:
         return pd.DataFrame(columns=["account_code", "account_name", "our_total", "raw_total", "difference"])
 
