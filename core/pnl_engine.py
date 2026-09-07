@@ -114,6 +114,50 @@ def compute_monthly_totals(raw_df: pd.DataFrame, account_rules: dict) -> pd.Data
             })
     return pd.DataFrame(rows)
 
+def compute_grouped_monthly_totals(
+    raw_df: pd.DataFrame,
+    mapping_df: pd.DataFrame,
+    account_rules: dict,
+    group_col: str,
+) -> pd.DataFrame:
+    """
+    Same as compute_monthly_totals(), but broken down by an
+    organizational dimension (e.g. LVL_2) as well as month - needed for
+    the Management Performance Report, which shows each sub-organization
+    as its own row (project spec section 26).
+
+    Implemented by running compute_monthly_totals() once per group
+    value, rather than a new formula-evaluation path, so the exact same
+    tested base/calculated logic applies at every level.
+
+    Args:
+        raw_df: cleaned RAW_SYSTEM(PL) or RAW_SYSTEM(EXP) DataFrame
+                (already scoped, e.g. to KAM 2).
+        mapping_df: output of mapping_engine.load_code_mapping().
+        account_rules: dict loaded from an account/category rules JSON.
+        group_col: mapping column to break down by, e.g. "LVL_2".
+
+    Returns:
+        Long-format DataFrame: MONTH, <group_col>, account_code,
+        account_name, amount.
+    """
+    merged = raw_df.merge(
+        mapping_df[["CCTR_CODE", group_col]],
+        left_on="CCTR",
+        right_on="CCTR_CODE",
+        how="left",
+    )
+    merged[group_col] = merged[group_col].fillna("(미매핑)")
+
+    all_groups = []
+    for group_value, group_df in merged.groupby(group_col):
+        group_totals = compute_monthly_totals(group_df, account_rules)
+        group_totals.insert(1, group_col, group_value)
+        all_groups.append(group_totals)
+
+    if not all_groups:
+        return pd.DataFrame(columns=["MONTH", group_col, "account_code", "account_name", "amount"])
+    return pd.concat(all_groups, ignore_index=True)
 
 def compute_pnl_summary(monthly_totals: pd.DataFrame, current_month: int, ytd_months: list[int]) -> pd.DataFrame:
     """
