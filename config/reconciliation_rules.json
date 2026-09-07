@@ -1,0 +1,15 @@
+{
+  "checks": [
+    {"account_code": "4410000", "name": "CE - Salaries (원가성 인건비)"},
+    {"account_code": "4420000", "name": "CE - General (원가성 일반경비)"}
+  ],
+  "tolerance": {
+    "warning_threshold": 1,
+    "error_threshold": 100
+  },
+  "_notes": {
+    "why_these_two_codes": "4410000 and 4420000 are the only account codes that appear as their own rows in BOTH RAW_SYSTEM(PL) and RAW_SYSTEM(EXP) - everything else in P/L is a P/L-only rollup (Revenue, GP1, ...) or an Expense-only detail line. This mirrors the real workbook's 검증 sheet, which reconciles exactly these two accounts per CCTR.",
+    "verified": "At CCTR x MONTH granularity, both codes matched exactly (difference = 0) across all 44 CCTR and all 7 available months in the source workbook.",
+    "tolerance": "warning_threshold and error_threshold are in the same currency unit as PERF. abs(difference) <= warning_threshold -> PASS; <= error_threshold -> WARNING; above that -> ERROR. Adjust as real-world rounding behavior is better understood."
+  }
+}
