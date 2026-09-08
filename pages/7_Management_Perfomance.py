@@ -25,6 +25,7 @@ import streamlit as st
 from core.period_engine import get_closing_period, check_data_availability
 from core.mapping_engine import filter_to_scope
 from core.pnl_engine import load_account_rules, compute_grouped_monthly_totals
+from core import db
 
 st.set_page_config(page_title="Management Performance", page_icon="📋", layout="wide")
 st.title("📋 Management Performance Report (경영실적 보고)")
@@ -36,6 +37,14 @@ if "raw_pl_df" not in st.session_state or "raw_expense_df" not in st.session_sta
 raw_pl_df = st.session_state["raw_pl_df"]
 raw_expense_df = st.session_state["raw_expense_df"]
 mapping_df = st.session_state["mapping_df"]
+
+try:
+    db_conn = db.get_connection()
+    db.init_schema(db_conn)
+    db_available = True
+except Exception:
+    db_conn = None
+    db_available = False
 
 st.info(
     "**계획(BP)/전년 컬럼은 아직 준비중입니다** (RAW 데이터에 PERF 실적만 있습니다). "
@@ -117,6 +126,11 @@ groups = sorted(pl_grouped["LVL_2"].dropna().unique().tolist())
 st.divider()
 st.subheader(f"경영실적 보고 — 당월({effective_month}월) / 전월({compare_month}월) / 누계(1~{effective_month}월)")
 
+if db_available:
+    saved_reasons = db.load_variance_reasons(db_conn, int(closing_year), int(closing_month), "management_performance")
+else:
+    saved_reasons = {}
+
 for group in groups:
     st.markdown(f"#### {group}")
     rows = []
@@ -152,17 +166,26 @@ for group in groups:
         hide_index=True,
     )
 
-    # --- Variance reason (project spec section 27) ---
+    # --- Variance reason (project spec section 27) - persisted to DB ---
     reason_key = f"variance_reason_{group}_{closing_year}_{closing_month}"
-    st.text_area(
+    reason_text = st.text_area(
         f"📝 {group} — 전월대비 증감사유",
+        value=saved_reasons.get(group, ""),
         key=reason_key,
-        placeholder="예: ESMI 자재 3구간 수익 감소 등 (이 세션 동안만 저장됩니다 - 영구 저장은 DB 연동 후 지원 예정)",
+        placeholder="예: ESMI 자재 3구간 수익 감소 등",
         height=80,
+        disabled=not db_available,
     )
+    if db_available:
+        if st.button("저장", key=f"save_{reason_key}"):
+            db.save_variance_reason(
+                db_conn, int(closing_year), int(closing_month),
+                "management_performance", group, reason_text,
+            )
+            st.success("저장했습니다.")
+    else:
+        st.caption("⚠️ DB에 연결되지 않아 이 메모는 저장할 수 없습니다.")
     st.divider()
 
-st.caption(
-    "증감사유는 현재 이 브라우저 세션에서만 유지됩니다. 새로고침하거나 다른 기기에서 열면 "
-    "사라집니다 — Phase 3(데이터베이스 연동) 이후 영구 저장을 지원할 예정입니다."
-)
+if not db_available:
+    st.caption("DB 연결 없이는 증감사유가 저장되지 않습니다. Streamlit Secrets 설정을 확인하세요.")
