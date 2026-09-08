@@ -36,9 +36,11 @@ try:
     conn = db.get_connection()
     db.init_schema(conn)
     db_available = True
-except Exception:
+except Exception as exc:
     conn = None
     db_available = False
+    with st.expander("🐞 DB 연결 에러 자세히 보기 (개발용)"):
+        st.exception(exc)
 
 if db_available:
     mapping_status = db.get_mapping_status(conn)
